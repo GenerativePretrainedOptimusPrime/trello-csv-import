@@ -78,10 +78,10 @@ class CSVImporter {
             return;
         }
 
-        if (token.length !== 64) {
+        /*if (token.length !== 64) {
             this.showError('Le token API doit contenir 64 caractères');
             return;
-        }
+        }*/
 
         try {
             // Test du token avec une requête simple
