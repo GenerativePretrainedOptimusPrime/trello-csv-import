@@ -11,10 +11,6 @@ const POWER_UP_CONFIG = {
     POPUP_WIDTH: 600
 };
 
-if (!apiKey) {
-  throw new Error("La variable d'environnement TRELLO_API_KEY n'est pas définie");
-}
-
 /**
  * Initialise le Power-Up Trello avec les capacités nécessaires
  */
