@@ -10,7 +10,7 @@ class CSVImporter {
         this.apiToken = '';
         this.csvData = [];
         this.listId = null;
-        this.apiKey = process.env.TRELLO_API_KEY;
+        this.apiKey = '8a9262f535095e08c9fb470372d1c72f';
         
         this.init();
     }
