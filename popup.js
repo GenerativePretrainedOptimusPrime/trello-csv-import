@@ -78,11 +78,6 @@ class CSVImporter {
             return;
         }
 
-        /*if (token.length !== 64) {
-            this.showError('Le token API doit contenir 64 caractères');
-            return;
-        }*/
-
         try {
             // Test du token avec une requête simple
             const response = await fetch(`https://api.trello.com/1/members/me?key=${this.apiKey}&token=${token}`);
