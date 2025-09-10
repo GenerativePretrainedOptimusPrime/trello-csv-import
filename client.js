@@ -6,7 +6,7 @@
 // Configuration globale
 const POWER_UP_CONFIG = {
     APP_NAME: 'CSV Import',
-    API_KEY: process.env.TRELLO_API_KEY,
+    API_KEY: '8a9262f535095e08c9fb470372d1c72f',
     POPUP_HEIGHT: 500,
     POPUP_WIDTH: 600
 };
