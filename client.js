@@ -90,7 +90,7 @@ window.PowerUpUtils = {
      * Valide le format d'un token Trello
      */
     validateToken: function(token) {
-        return token && typeof token === 'string' && token.length === 64;
+        return token && typeof token === 'string';
     },
 
     /**
