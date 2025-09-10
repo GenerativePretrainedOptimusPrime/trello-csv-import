@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importer CSV vers Trello</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+</head>
+<body>
+    <div class="popup-container">
+        <!-- Étape 1: Configuration du token -->
+        <div id="step-1" class="step-content active">
+            <h3>🔐 Configuration de l'API Trello</h3>
+            <div class="form-group">
+                <label for="api-token">Token API Trello :</label>
+                <input type="password" id="api-token" placeholder="Collez votre token API Trello ici" class="form-input">
+                <small class="form-help">
+                    <a href="#" id="get-token-link" target="_blank">Obtenir un token API</a>
+                </small>
+            </div>
+            <button id="validate-token" class="btn btn-primary">Valider le token</button>
+        </div>
+
+        <!-- Étape 2: Sélection du fichier CSV -->
+        <div id="step-2" class="step-content">
+            <h3>📄 Sélection du fichier CSV</h3>
+            <div class="form-group">
+                <label for="csv-file">Fichier CSV :</label>
+                <input type="file" id="csv-file" accept=".csv" class="form-input">
+                <small class="form-help">
+                    Format attendu : Première colonne = nom de la carte, colonnes suivantes = description
+                </small>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="skip-header"> Ignorer la première ligne (en-tête)
+                </label>
+            </div>
+        </div>
+
+        <!-- Étape 3: Prévisualisation -->
+        <div id="step-3" class="step-content">
+            <h3>👁️ Prévisualisation des données</h3>
+            <div id="csv-preview" class="csv-preview"></div>
+            <div class="form-group">
+                <small id="preview-info" class="form-help"></small>
+            </div>
+        </div>
+
+        <!-- Étape 4: Import en cours -->
+        <div id="step-4" class="step-content">
+            <h3>⏳ Import en cours...</h3>
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+            <div id="import-status" class="import-status"></div>
+        </div>
+
+        <!-- Étape 5: Résultats -->
+        <div id="step-5" class="step-content">
+            <h3>✅ Import terminé</h3>
+            <div id="import-results" class="import-results"></div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="popup-actions">
+            <button id="prev-step" class="btn btn-secondary" style="display: none;">Précédent</button>
+            <button id="next-step" class="btn btn-primary">Suivant</button>
+            <button id="import-csv" class="btn btn-success" style="display: none;">Importer</button>
+            <button id="close-popup" class="btn btn-secondary" style="display: none;">Fermer</button>
+        </div>
+
+        <!-- Messages d'erreur -->
+        <div id="error-message" class="error-message" style="display: none;"></div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

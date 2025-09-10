@@ -1,0 +1,37 @@
+{
+  "name": "CSV Import Power-Up",
+  "version": "1.0.0",
+  "description": "Importez facilement des tâches depuis un fichier CSV directement dans vos listes Trello",
+  "details": "Ce Power-Up permet aux utilisateurs d'importer des cartes Trello en masse à partir de fichiers CSV. Il offre une interface intuitive en plusieurs étapes : authentification API, sélection du fichier, prévisualisation des données et import avec suivi en temps réel.",
+  "author": {
+    "name": "eAO",
+    "email": "edenelie.a.pro@gmail.com",
+    "url": "https://votre-site.com"
+  },
+  "capabilities": [
+    "list-actions",
+    "card-buttons",
+    "authorization-status",
+    "show-authorization"
+  ],
+  "connector": {
+    "url": "https://github.com/generativepretrainedoptimusprime/trello-csv-import"
+  },
+  "icon": {
+    "url": "https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/icons/upload.svg"
+  },
+  "tags": [
+    "productivity",
+    "import",
+    "csv",
+    "bulk-operations",
+    "automation"
+  ],
+  "permissions": [
+    "read",
+    "write"
+  ],
+  "appKey": "8a9262f535095e08c9fb470372d1c72f",
+  "isPrivate": true,
+  "moderatedState": "claimed"
+}
