@@ -169,23 +169,41 @@ class CSVImporter {
   }
 
   async getLabelIds(priority) {
-    const colorMap = { Haute: 'red', Moyenne: 'yellow', Basse: 'green' };
-    const color = colorMap[priority] || 'blue';
-    const res = await fetch(`https://api.trello.com/1/boards/${this.boardId}/labels?key=${this.apiKey}&token=${this.apiToken}`);
+    // Normalisation : majuscule première lettre, reste en minuscule
+    const p = priority.trim().toLowerCase();
+    const norm = p.charAt(0).toUpperCase() + p.slice(1);
+    // Couleurs Trello autorisées : green, yellow, orange, red, purple, blue, sky, lime, pink, black
+    const colorMap = {
+      Haute: 'red',
+      Moyenne: 'yellow',
+      Basse: 'green'
+    };
+    const color = colorMap[norm] || 'blue';
+    
+    // Récupère d’abord les étiquettes existantes
+    const res = await fetch(
+      `https://api.trello.com/1/boards/${this.boardId}/labels?key=${this.apiKey}&token=${this.apiToken}`
+    );
     const labels = await res.json();
-    let lbl = labels.find(l => l.name === priority);
-    if (lbl) return [lbl.id];
+    // Recherche sur le nom normalisé
+    let lbl = labels.find(l => l.name === norm);
+    if (lbl) {
+      // Si couleur différente, on peut la mettre à jour ici si besoin
+      return [lbl.id];
+    }
+    // Sinon, crée la nouvelle étiquette avec la couleur
     const cr = await fetch('https://api.trello.com/1/labels', {
       method: 'POST',
       body: new URLSearchParams({
         key: this.apiKey,
         token: this.apiToken,
         idBoard: this.boardId,
-        name: priority,
+        name: norm,
         color
       })
     });
-    return [(await cr.json()).id];
+    const newLbl = await cr.json();
+    return [newLbl.id];
   }
 
   showResults(s, e, det) {
