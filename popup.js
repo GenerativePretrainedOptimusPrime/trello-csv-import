@@ -3,17 +3,17 @@
  */
 
 class CSVImporter {
-    constructor() {
-        this.t = TrelloPowerUp.iframe();
-        this.currentStep = 1;
-        this.maxSteps = 5;
-        this.apiToken = '';
-        this.csvData = [];
-        this.listId = null;
-        this.apiKey = '65bfcc2b535466b79e76dcbbc235cbd6';
-        
-        this.init();
-    }
+  constructor() {
+    this.t = TrelloPowerUp.iframe();
+    this.currentStep = 1;
+    this.maxSteps = 5;
+    this.apiToken = '';
+    this.csvData = [];
+    this.listId = null;
+    this.boardId = null;
+    this.apiKey = '65bfcc2b535466b79e76dcbbc235cbd6';
+    this.init();
+  }
 
     /**
      * Initialise l'interface et les événements
@@ -21,9 +21,9 @@ class CSVImporter {
     init() {
         this.setupEventListeners();
         this.updateTokenLink();
-        this.getCurrentListId();
+        this.getCurrentContext();
         this.updateStepVisibility();
-    }
+      }
 
     /**
      * Configure tous les événements de l'interface
@@ -62,8 +62,9 @@ class CSVImporter {
         try {
             const context = await this.t.getContext();
             this.listId = context.list;
+            this.boardId = context.board;
         } catch (error) {
-            this.showError('Impossible de récupérer la liste courante');
+            this.showError('Impossible de récupérer le contexte Trello');
         }
     }
 
@@ -138,14 +139,15 @@ class CSVImporter {
     this.csvData = lines
       .slice(skipHeader ? 1 : 0)
       .map(line => {
-        const [name, ...cols] = this.parseCSVLine(line);
-        const priority = cols.pop().trim();          // on récupère la dernière colonne
-        const description = cols.join('\n').trim();  // le reste compose la description
+        const cols = this.parseCSVLine(line);
+        const name = cols[0] || '';
+        const priority = cols[2] || '';
+        const description = cols[1] || '';
         return { name, description, priority };
       })
       .filter(row => row.name);
     
-            this.displayPreview();
+        this.displayPreview();
         }
 
     /**
