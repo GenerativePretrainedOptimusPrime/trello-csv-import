@@ -12,7 +12,8 @@
     "list-actions",
     "card-buttons",
     "authorization-status",
-    "show-authorization"
+    "show-authorization",
+    "board-buttons"
   ],
   "connector": {
     "url": "https://github.com/generativepretrainedoptimusprime/trello-csv-import"
