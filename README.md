@@ -21,7 +21,7 @@ Le fichier CSV doit respecter ce format :
 ### Exemple de fichier CSV
 
 ```csv
-Nom de la tâche,Description,Priorité,Assigné à
+Nom de la tâche,Description,Priorité(Haute, Moyenne, Basse),Assigné à
 Créer la maquette,Maquette de la page d'accueil,Haute,Designer
 Développer l'API,Endpoints REST pour l'authentification,Moyenne,Développeur
 Tests unitaires,Couverture de code 90%,Basse,QA
