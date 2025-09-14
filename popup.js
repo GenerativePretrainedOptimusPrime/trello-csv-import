@@ -134,13 +134,19 @@ class CSVImporter {
         const lines = content.split('\n').filter(line => line.trim());
         const skipHeader = document.getElementById('skip-header').checked;
         
-        this.csvData = lines
-            .slice(skipHeader ? 1 : 0)
-            .map(line => this.parseCSVLine(line))
-            .filter(row => row.length > 0 && row[0].trim());
-
-        this.displayPreview();
-    }
+    // On va stocker csvData sous forme d’objets plutôt que tableaux simples
+    this.csvData = lines
+      .slice(skipHeader ? 1 : 0)
+      .map(line => {
+        const [name, ...cols] = this.parseCSVLine(line);
+        const priority = cols.pop().trim();          // on récupère la dernière colonne
+        const description = cols.join('\n').trim();  // le reste compose la description
+        return { name, description, priority };
+      })
+      .filter(row => row.name);
+    
+            this.displayPreview();
+        }
 
     /**
      * Parse une ligne CSV en gérant les guillemets et virgules
@@ -171,35 +177,26 @@ class CSVImporter {
      * Affiche la prévisualisation des données CSV
      */
     displayPreview() {
-        const preview = document.getElementById('csv-preview');
-        const info = document.getElementById('preview-info');
-        
-        if (this.csvData.length === 0) {
-            preview.innerHTML = '<p class="no-data">Aucune donnée trouvée dans le fichier CSV</p>';
-            return;
-        }
-
-        let html = '<table class="preview-table"><thead><tr><th>Nom de la carte</th><th>Description</th></tr></thead><tbody>';
-        
-        const maxPreview = Math.min(5, this.csvData.length);
-        
-        for (let i = 0; i < maxPreview; i++) {
-            const row = this.csvData[i];
-            const name = row[0] || '';
-            const description = row.slice(1).join(' ') || '';
-            
-            html += `<tr><td>${this.escapeHtml(name)}</td><td>${this.escapeHtml(description)}</td></tr>`;
-        }
-        
-        html += '</tbody></table>';
-        
-        if (this.csvData.length > maxPreview) {
-            html += `<p class="preview-more">... et ${this.csvData.length - maxPreview} ligne(s) supplémentaire(s)</p>`;
-        }
-        
-        preview.innerHTML = html;
-        info.textContent = `${this.csvData.length} carte(s) seront créées`;
+      const preview = document.getElementById('csv-preview');
+      const info    = document.getElementById('preview-info');
+      if (!this.csvData.length) {
+        preview.innerHTML = 'Aucune donnée trouvée';
+        return;
+      }
+      let html = `
+        | Nom de la carte | Description | Priorité |
+        | --- | --- | --- |
+      `;
+      this.csvData.slice(0, 5).forEach(row => {
+        html += `| ${this.escapeHtml(row.name)} | ${this.escapeHtml(row.description)} | ${this.escapeHtml(row.priority)} |\n`;
+      });
+      if (this.csvData.length > 5) {
+        html += `… et ${this.csvData.length - 5} ligne(s) supplémentaire(s)\n`;
+      }
+      preview.innerHTML = html;
+      info.textContent  = `${this.csvData.length} carte(s) seront créées`;
     }
+
 
     /**
      * Importe les données CSV vers Trello
@@ -249,28 +246,52 @@ class CSVImporter {
     /**
      * Crée une carte Trello via l'API
      */
-    async createTrelloCard(name, description = '') {
-        const url = 'https://api.trello.com/1/cards';
-        const params = new URLSearchParams({
-            key: this.apiKey,
-            token: this.apiToken,
-            idList: this.listId,
-            name: name,
-            desc: description
-        });
-
-        const response = await fetch(url, {
-            method: 'POST',
-            body: params
-        });
-
-        if (!response.ok) {
-            const error = await response.text();
-            throw new Error(`Erreur API (${response.status}): ${error}`);
-        }
-
-        return await response.json();
+    async createTrelloCard({ name, description, priority }) {
+      const labelIds = await this.getLabelIds(priority);
+      const params = new URLSearchParams({
+        key: this.apiKey,
+        token: this.apiToken,
+        idList: this.listId,
+        name,
+        desc: description,
+        idLabels: labelIds.join(',')
+      });
+      const response = await fetch('https://api.trello.com/1/cards', {
+        method: 'POST',
+        body: params
+      });
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`Erreur API (${response.status}): ${error}`);
+      }
+      return response.json();
     }
+    
+    // Nouvelle méthode pour récupérer ou créer l’étiquette correspondant à la priorité
+    async getLabelIds(priority) {
+      // Mapping simple priorité → couleur
+      const colorMap = { Haute: 'red', Moyenne: 'yellow', Basse: 'green' };
+      const color = colorMap[priority] || 'blue';
+      // Récupère les labels du board via l’API Trello
+      const res = await fetch(`https://api.trello.com/1/boards/${this.t.getContext().board}/labels?key=${this.apiKey}&token=${this.apiToken}`);
+      const labels = await res.json();
+      let label = labels.find(l => l.name === priority);
+      if (label) return [label.id];
+      // Sinon crée l’étiquette
+      const createRes = await fetch('https://api.trello.com/1/labels', {
+        method: 'POST',
+        body: new URLSearchParams({
+          key: this.apiKey,
+          token: this.apiToken,
+          idBoard: this.t.getContext().board,
+          name: priority,
+          color
+        })
+      });
+      const newLabel = await createRes.json();
+      return [newLabel.id];
+    }
+
 
     /**
      * Affiche les résultats de l'import
