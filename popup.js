@@ -177,55 +177,68 @@ class CSVImporter {
    * Importe les données CSV vers Trello
    */
   async importCSV() {
-    if (!this.csvData.length || !this.apiToken || !this.listId) {
-      this.showError('Données manquantes');
-      return;
-    }
-
-    this.currentStep = 4;
-    this.updateStepVisibility();
-
-    const total = this.csvData.length;
-    let succ = 0, errs = 0, details = [];
-
-    for (let i = 0; i < total; i++) {
-      const { name, description, priority } = this.csvData[i];
-      this.updateStatus(`Import de "${name}" (${i+1}/${total})`);
-
-      try {
-        await this.createTrelloCard({ name, description, priority });
-        succ++;
-      } catch (e) {
-        errs++;
-        details.push(`${name}: ${e.message}`);
+      if (!this.csvData.length || !this.apiToken || !this.listId) {
+        this.showError('Données manquantes');
+        return;
       }
-
-      this.updateProgress(i+1, total);
-      await this.delay(200);
-    }
-
-    this.showResults(succ, errs, details);
-    this.nextStep();
-  }
+  
+      this.currentStep = 4;
+      this.updateStepVisibility();
+  
+      const total = this.csvData.length;
+      let succ = 0, errs = 0, details = [];
+  
+      for (let i = 0; i < total; i++) {
+        const { name, description, priority } = this.csvData[i];
+        this.updateStatus(`Import de "${name}" (${i + 1}/${total})`);
+        try {
+          await this.createTrelloCard({ name, description, priority });
+          succ++;
+        } catch (e) {
+          errs++;
+          details.push(`${name}: ${e.message}`);
+        }
+        this.updateProgress(i + 1, total);
+        await this.delay(200);
+      }
 
   /**
    * Crée une carte Trello via l'API (avec étiquette priorité)
    */
-  async createTrelloCard({ name, description, priority }) {
-    const labelIds = await this.getLabelIds(priority);
-    const params = new URLSearchParams({
-      key: this.apiKey,
-      token: this.apiToken,
-      idList: this.listId,
-      name,
-      desc: description,
-      idLabels: labelIds.join(',')
-    });
-    const res = await fetch('https://api.trello.com/1/cards', { method: 'POST', body: params });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
-  }
-
+     async createTrelloCard({ name, description, priority }) {
+      // on ne demande les labels QUE si priorité non vide
+      let labelParam = {};
+      if (priority) {
+        const labelIds = await this.getLabelIds(priority);
+        if (labelIds.length) {
+          labelParam.idLabels = labelIds.join(',');
+        }
+      }
+      const params = new URLSearchParams({
+        key: this.apiKey,
+        token: this.apiToken,
+        idList: this.listId,
+        name,
+        desc: description,
+        ...labelParam
+      });
+      const res = await fetch('https://api.trello.com/1/cards', {
+        method: 'POST',
+        body: params
+      });
+      const text = await res.text();
+      if (!res.ok) {
+        // renvoyer le texte brut en message d'erreur
+        throw new Error(text);
+      }
+      // tenter de parser le JSON uniquement si c'est valide
+      try {
+        return JSON.parse(text);
+      } catch {
+        return {};
+      }
+    }
+    
   /**
    * Récupère ou crée l’étiquette correspondant à la priorité
    */
