@@ -232,7 +232,7 @@ class CSVImporter {
   async getLabelIds(priority) {
     const colorMap = { Haute: 'red', Moyenne: 'yellow', Basse: 'green' };
     const color = colorMap[priority] || 'blue';
-    const { board } = await this.t.getContext();
+    const { board } = await this.boardId;
     const res = await fetch(`https://api.trello.com/1/boards/${board}/labels?key=${this.apiKey}&token=${this.apiToken}`);
     const labels = await res.json();
     let lbl = labels.find(l => l.name === priority);
