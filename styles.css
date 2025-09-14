@@ -1,0 +1,81 @@
+/* Magnitude Import Power-Up – Styles essentiels */
+
+body, input, button {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: #333;
+}
+
+.step {
+  display: none;
+  padding: 10px;
+}
+
+.step.active {
+  display: block;
+}
+
+.actions {
+  text-align: right;
+  margin: 10px;
+}
+
+button {
+  background: #026aa7;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  margin-left: 5px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #bbb;
+  cursor: not-allowed;
+}
+
+#error-message {
+  margin-top: 8px;
+  padding: 6px;
+  border-radius: 3px;
+  display: none;
+}
+
+.error-message.show {
+  background: #f8d7da;
+  color: #721c24;
+  display: block;
+}
+
+.success-message.show {
+  background: #d4edda;
+  color: #155724;
+  display: block;
+}
+
+.progress {
+  background: #eee;
+  border-radius: 3px;
+  overflow: hidden;
+  height: 8px;
+  margin: 10px 0;
+}
+
+#progress-bar {
+  background: #5cb85c;
+  height: 8px;
+  width: 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 6px;
+}
+
+table th, table td {
+  padding: 4px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
