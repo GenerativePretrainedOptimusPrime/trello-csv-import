@@ -169,42 +169,39 @@ class CSVImporter {
   }
 
   async getLabelIds(priority) {
-    // Normalisation : majuscule première lettre, reste en minuscule
-    const p = priority.trim().toLowerCase();
-    const norm = p.charAt(0).toUpperCase() + p.slice(1);
-    // Couleurs Trello autorisées : green, yellow, orange, red, purple, blue, sky, lime, pink, black
+    // Nettoyage et mise en minuscule
+    const key = priority.trim().toLowerCase();
+    // Couleurs Trello valides
     const colorMap = {
-      Haute: 'red',
-      Moyenne: 'yellow',
-      Basse: 'green'
+      haute: 'red',
+      moyenne: 'yellow',
+      basse: 'green'
     };
-    const color = colorMap[norm] || 'blue';
-    
-    // Récupère d’abord les étiquettes existantes
-    const res = await fetch(
-      `https://api.trello.com/1/boards/${this.boardId}/labels?key=${this.apiKey}&token=${this.apiToken}`
-    );
+    const color = colorMap[key] || 'blue';
+    // Normalisation du nom d’étiquette (première lettre majuscule)
+    const name = key.charAt(0).toUpperCase() + key.slice(1);
+  
+    // Récupère les étiquettes existantes
+    const res = await fetch(`https://api.trello.com/1/boards/${this.boardId}/labels?key=${this.apiKey}&token=${this.apiToken}`);
     const labels = await res.json();
-    // Recherche sur le nom normalisé
-    let lbl = labels.find(l => l.name === norm);
-    if (lbl) {
-      // Si couleur différente, on peut la mettre à jour ici si besoin
-      return [lbl.id];
-    }
-    // Sinon, crée la nouvelle étiquette avec la couleur
+    let lbl = labels.find(l => l.name === name);
+    if (lbl) return [lbl.id];
+  
+    // Crée une nouvelle étiquette avec la bonne couleur
     const cr = await fetch('https://api.trello.com/1/labels', {
       method: 'POST',
       body: new URLSearchParams({
         key: this.apiKey,
         token: this.apiToken,
         idBoard: this.boardId,
-        name: norm,
+        name,
         color
       })
     });
     const newLbl = await cr.json();
     return [newLbl.id];
   }
+
 
   showResults(s, e, det) {
     const div = document.getElementById('import-results');
